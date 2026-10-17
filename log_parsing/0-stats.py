@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Parse HTTP logs from standard input."""
+"""Parse HTTP access logs and display cumulative statistics."""
 
 import re
 import sys
@@ -14,16 +14,16 @@ PATTERN = re.compile(
 
 
 def print_stats(total_size, counts):
-    """Print cumulative log statistics."""
+    """Print accumulated statistics."""
     print("File size: {}".format(total_size))
     for code in CODES:
-        if counts[code]:
+        if counts[code] > 0:
             print("{}: {}".format(code, counts[code]))
     sys.stdout.flush()
 
 
 def main():
-    """Read log entries and calculate statistics."""
+    """Read logs from standard input."""
     total_size = 0
     counts = {code: 0 for code in CODES}
     lines = 0
@@ -46,6 +46,9 @@ def main():
 
     except KeyboardInterrupt:
         print_stats(total_size, counts)
+    else:
+        if lines % 10 != 0:
+            print_stats(total_size, counts)
 
 
 if __name__ == "__main__":
